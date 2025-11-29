@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">{{ view.action }} Turma</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Campos básicos -->
+                    <div class="mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                        {{ form.nome }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.periodo.id_for_label }}" class="form-label">Período</label>
+                        {{ form.periodo }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.abreviatura.id_for_label }}" class="form-label">Abreviatura</label>
+                        {{ form.abreviatura }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.cor.id_for_label }}" class="form-label">Cor</label>
+                        {{ form.cor }}
+                    </div>
+
+                    <!-- Grid de Dias/Tempos Permitidos -->
+                    <h4 class="mt-4 mb-3">Dias e Tempos Permitidos</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>Tempo / Dia</th>
+                                    {% for dia in dias_semana %}
+                                    <th>
+                                        {{ dia.nome }}
+                                        <br>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1"
+                                            onclick="toggleColumn('{{ dia.id }}')">
+                                            <small>⬇️</small>
+                                        </button>
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in grid_rows %}
+                                <tr>
+                                    <td class="fw-bold">
+                                        {{ row.tempo.nome }} <br> <small>{{ row.tempo.inicio }} - {{ row.tempo.fim
+                                            }}</small>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1 ms-2"
+                                            onclick="toggleRow(this)">
+                                            <small>➡️</small>
+                                        </button>
+                                    </td>
+                                    {% for slot in row.slots %}
+                                    <td>
+                                        {% if slot.slot_id %}
+                                        <input type="checkbox" name="dias" value="{{ slot.slot_id }}"
+                                            class="form-check-input col-dia-{{ slot.dia.id }}" {% if slot.is_checked
+                                            %}checked{% endif %}>
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Aulas (Lista) -->
+                    <div class="mb-3 mt-4">
+                        <label class="form-label">Aulas</label>
+                        <div class="card p-3" style="max-height: 200px; overflow-y: auto;">
+                            {{ form.aulas }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'turma_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleColumn(diaId) {
+        const checkboxes = document.querySelectorAll('.col-dia-' + diaId);
+        // Check if all are checked to decide whether to uncheck or check all
+        let allChecked = true;
+        checkboxes.forEach(cb => {
+            if (!cb.checked) allChecked = false;
+        });
+
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+    }
+
+    function toggleRow(btn) {
+        const row = btn.closest('tr');
+        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+
+        let allChecked = true;
+        checkboxes.forEach(cb => {
+            if (!cb.checked) allChecked = false;
+        });
+
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+    }
+</script>
+{% endblock %}

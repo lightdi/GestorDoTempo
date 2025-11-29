@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 text-success fw-bold">Painel Administrativo</h1>
+            <p class="lead text-muted">Gerencie os cadastros do sistema</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Professores -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Professores</h3>
+                    <p class="card-text">Gerenciar cadastro de professores.</p>
+                    <a href="{% url 'professor_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disciplinas -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Disciplinas</h3>
+                    <p class="card-text">Gerenciar disciplinas ofertadas.</p>
+                    <a href="{% url 'disciplinas_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tempos -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Tempos</h3>
+                    <p class="card-text">Configurar horários de aula.</p>
+                    <a href="{% url 'tempo_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aulas -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Aulas</h3>
+                    <p class="card-text">Gerenciar grade de aulas.</p>
+                    <a href="{% url 'aula_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Turmas -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Turmas</h3>
+                    <p class="card-text">Gerenciar turmas.</p>
+                    <a href="{% url 'turma_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dias da Semana -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Dias da Semana</h3>
+                    <p class="card-text">Configurar dias letivos.</p>
+                    <a href="{% url 'diasemana_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Semestres -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Semestres</h3>
+                    <p class="card-text">Gerenciar semestres letivos.</p>
+                    <a href="{% url 'semestre_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prédios -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Prédios</h3>
+                    <p class="card-text">Cadastrar prédios da instituição.</p>
+                    <a href="{% url 'predio_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Salas -->
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm hover-card">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-success">Salas</h3>
+                    <p class="card-text">Gerenciar salas de aula.</p>
+                    <a href="{% url 'sala_list' %}" class="btn btn-outline-success stretched-link">Acessar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <a href="/" class="btn btn-secondary">Voltar ao Calendário</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.2s;
+    }
+
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+</style>
+{% endblock %}

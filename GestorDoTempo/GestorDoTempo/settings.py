@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+# Database
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+     # Suas apps
+    'cadastro',
+    'calendario',
+    'core',
+    'horario',
+    'relatorio',
 ]
 
 MIDDLEWARE = [
@@ -54,7 +63,7 @@ ROOT_URLCONF = 'GestorDoTempo.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -69,17 +78,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'GestorDoTempo.wsgi.application'
 
 
-# Database
+
+
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gestordotempo_db',
-        'USER': 'gestordotempo',
-        'PASSWORD': '!GestorDoTempo123!',
-        'HOST': 'integramaker.ifpb.edu.br',   # ou IP do servidor
-        'PORT': '8999',
+        'NAME': os.environ.get('DB_NAME', 'gestordotempo_db'),
+        'USER': os.environ.get('DB_USER', 'gestordotempo'),
+        'PASSWORD': os.environ.get('DB_PASSWORD','!GestorDoTempo123!'),
+        'HOST': os.environ.get('DB_HOST', 'integramaker.ifpb.edu.br'),
+        'PORT': os.environ.get('DB_PORT', '8999'),
     }
 }
 
@@ -107,18 +117,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
 LANGUAGE_CODE = 'pt-br'
-
 TIME_ZONE = 'America/Fortaleza'
-
 USE_I18N = True
-
 USE_TZ = True
+
+LOGIN_URL = '/admin/login/'
 
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

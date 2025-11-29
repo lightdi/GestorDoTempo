@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestor do Tempo{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #198754; /* Green */
+            --secondary-color: #dc3545; /* Red */
+        }
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: var(--primary-color) !important;
+        }
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        .btn-primary:hover {
+            background-color: #157347;
+            border-color: #146c43;
+        }
+        .btn-danger {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="#">Gestor do Tempo</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'professor_list' %}">Professores</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'disciplinas_list' %}">Disciplinas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'tempo_list' %}">Tempos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'aula_list' %}">Aulas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'turma_list' %}">Turmas</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'diasemana_list' %}">Dias da Semana</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'semestre_list' %}">Semestres</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'predio_list' %}">Prédios</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'sala_list' %}">Salas</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

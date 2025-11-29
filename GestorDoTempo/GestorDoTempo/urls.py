@@ -15,8 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+     # Rota principal apontando para o calendário
+    path('', include('calendario.urls')),
+
+    # Outras apps (se quiser já deixar preparado)
+    path('cadastro/', include('cadastro.urls')),
+    #path('horario/', include('horario.urls')),
+    #path('relatorio/', include('relatorio.urls')),
+    path('core/', include('core.urls')),
 ]
+
+
+# Servir arquivos de mídia em modo DEBUG
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
