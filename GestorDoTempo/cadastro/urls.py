@@ -9,6 +9,7 @@ from .views import (
     SemestreListView, SemestreCreateView, SemestreUpdateView, SemestreDeleteView,
     PredioListView, PredioCreateView, PredioUpdateView, PredioDeleteView,
     SalaListView, SalaCreateView, SalaUpdateView, SalaDeleteView,
+    CursoListView, CursoCreateView, CursoUpdateView, CursoDeleteView,
     create_aula_ajax, get_aula_details_ajax, update_aula_ajax
 )
 
@@ -47,6 +48,13 @@ urlpatterns = [
     path('turma/novo/', TurmaCreateView.as_view(), name='turma_create'),
     path('turma/<int:pk>/editar/', TurmaUpdateView.as_view(), name='turma_update'),
     path('turma/<int:pk>/excluir/', TurmaDeleteView.as_view(), name='turma_delete'),
+
+    # Curso
+    path('curso/', CursoListView.as_view(), name='curso_list'),
+    path('curso/novo/', CursoCreateView.as_view(), name='curso_create'),
+    path('curso/<int:pk>/editar/', CursoUpdateView.as_view(), name='curso_update'),
+    path('curso/<int:pk>/excluir/', CursoDeleteView.as_view(), name='curso_delete'),
+
 
     # DiaSemana
     path('diasemana/', DiaSemanaListView.as_view(), name='diasemana_list'),

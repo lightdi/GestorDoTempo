@@ -3,10 +3,10 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Professor, Disciplinas, Tempo, Aula, Turma, DiaSemana, Semestre, Predio, Sala
+from .models import Professor, Disciplinas, Tempo, Aula, Turma, DiaSemana, Semestre, Predio, Sala, Curso
 from .forms import (
     ProfessorForm, DisciplinasForm, TempoForm, AulaForm, TurmaForm, 
-    DiaSemanaForm, SemestreForm, PredioForm, SalaForm
+    DiaSemanaForm, SemestreForm, PredioForm, SalaForm, CursoForm
 )
 
 @require_POST
@@ -75,6 +75,21 @@ def update_aula_ajax(request):
 class ProfessorListView(ListView):
     model = Professor
     template_name = 'cadastro/professor_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'abreviatura':
+                queryset = queryset.filter(abreviatura__icontains=q)
+            elif filter_by == 'email':
+                queryset = queryset.filter(email__icontains=q)
+        return queryset
 
 class ProfessorCreateView(CreateView):
     model = Professor
@@ -155,6 +170,19 @@ class ProfessorDeleteView(DeleteView):
 class DisciplinasListView(ListView):
     model = Disciplinas
     template_name = 'cadastro/disciplinas_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'abreviatura':
+                queryset = queryset.filter(abreviatura__icontains=q)
+        return queryset
 
 class DisciplinasCreateView(CreateView):
     model = Disciplinas
@@ -177,6 +205,17 @@ class DisciplinasDeleteView(DeleteView):
 class TempoListView(ListView):
     model = Tempo
     template_name = 'cadastro/tempo_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+        return queryset
 
 class TempoCreateView(CreateView):
     model = Tempo
@@ -199,6 +238,21 @@ class TempoDeleteView(DeleteView):
 class AulaListView(ListView):
     model = Aula
     template_name = 'cadastro/aula_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'disciplina':
+                queryset = queryset.filter(disciplina__nome__icontains=q)
+            elif filter_by == 'professor':
+                queryset = queryset.filter(professor__nome__icontains=q)
+            elif filter_by == 'sala':
+                queryset = queryset.filter(sala__nome__icontains=q)
+        return queryset
 
 class AulaCreateView(CreateView):
     model = Aula
@@ -279,6 +333,21 @@ class AulaDeleteView(DeleteView):
 class TurmaListView(ListView):
     model = Turma
     template_name = 'cadastro/turma_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'periodo':
+                queryset = queryset.filter(periodo__icontains=q)
+            elif filter_by == 'abreviatura':
+                queryset = queryset.filter(abreviatura__icontains=q)
+        return queryset
 
 class TurmaCreateView(CreateView):
     model = Turma
@@ -362,10 +431,57 @@ class TurmaDeleteView(DeleteView):
     template_name = 'cadastro/turma_confirm_delete.html'
     success_url = reverse_lazy('turma_list')
 
+# Curso
+class CursoListView(ListView):
+    model = Curso
+    template_name = 'cadastro/curso_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'abreviatura':
+                queryset = queryset.filter(abreviatura__icontains=q)
+        return queryset
+
+class CursoCreateView(CreateView):
+    model = Curso
+    form_class = CursoForm
+    template_name = 'cadastro/curso_form.html'
+    success_url = reverse_lazy('curso_list')
+
+class CursoUpdateView(UpdateView):
+    model = Curso
+    form_class = CursoForm
+    template_name = 'cadastro/curso_form.html'
+    success_url = reverse_lazy('curso_list')
+
+class CursoDeleteView(DeleteView):
+    model = Curso
+    template_name = 'cadastro/curso_confirm_delete.html'
+    success_url = reverse_lazy('curso_list')
+
+
 # DiaSemana
 class DiaSemanaListView(ListView):
     model = DiaSemana
     template_name = 'cadastro/diasemana_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+        return queryset
 
 class DiaSemanaCreateView(CreateView):
     model = DiaSemana
@@ -388,6 +504,19 @@ class DiaSemanaDeleteView(DeleteView):
 class SemestreListView(ListView):
     model = Semestre
     template_name = 'cadastro/semestre_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'periodo':
+                queryset = queryset.filter(periodo__icontains=q)
+        return queryset
 
 class SemestreCreateView(CreateView):
     model = Semestre
@@ -410,6 +539,19 @@ class SemestreDeleteView(DeleteView):
 class PredioListView(ListView):
     model = Predio
     template_name = 'cadastro/predio_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'endereco':
+                queryset = queryset.filter(Endereco__icontains=q)
+        return queryset
 
 class PredioCreateView(CreateView):
     model = Predio
@@ -432,6 +574,19 @@ class PredioDeleteView(DeleteView):
 class SalaListView(ListView):
     model = Sala
     template_name = 'cadastro/sala_list.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        filter_by = self.request.GET.get('filter_by')
+        
+        if q and filter_by:
+            if filter_by == 'nome':
+                queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'predio':
+                queryset = queryset.filter(predio__nome__icontains=q)
+        return queryset
 
 class SalaCreateView(CreateView):
     model = Sala

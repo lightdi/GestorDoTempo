@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cadastro_extras %}
 
 {% block content %}
 <div class="card mt-4">
@@ -7,6 +8,26 @@
         <a href="{% url 'aula_create' %}" class="btn btn-light text-success fw-bold">Novo Aula</a>
     </div>
     <div class="card-body">
+        <form method="get" class="row g-3 mb-3 align-items-center">
+            <div class="col-auto">
+                <select name="filter_by" class="form-select">
+                    <option value="disciplina" {% is_selected request.GET.filter_by 'disciplina' %}>Disciplina</option>
+                    <option value="professor" {% is_selected request.GET.filter_by 'professor' %}>Professor</option>
+                    <option value="sala" {% is_selected request.GET.filter_by 'sala' %}>Sala</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <input type="text" name="q" class="form-control" placeholder="Pesquisar..." value="{{ request.GET.q }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+            </div>
+            {% if request.GET.q %}
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary">Limpar</a>
+            </div>
+            {% endif %}
+        </form>
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
@@ -36,6 +57,7 @@
                 </tbody>
             </table>
         </div>
+        {% include 'cadastro/pagination.html' %}
     </div>
 </div>
 {% endblock %}

@@ -25,7 +25,17 @@ class Professor(models.Model):
         return f"{self.nome} ({self.abreviatura})" 
 
 
+
+class Curso(models.Model):
+    nome = models.CharField(max_length=100)
+    periodos = models.PositiveIntegerField()
+    abreviatura = models.CharField(max_length=20)
+    def __str__(self):
+        return self.nome
+
 class Disciplinas(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, null=True, blank=True)
+
     nome = models.CharField(max_length=100)
     abreviatura = models.CharField(max_length=20)
     quantidade_aulas = models.PositiveIntegerField()
@@ -72,7 +82,10 @@ class Aula(models.Model):
     def __str__(self):
         return f"{self.disciplina.abreviatura} ({self.disciplina.quantidade_aulas}) : {self.professor.abreviatura} : {self.sala.nome}"
 
+
+
 class Turma(models.Model):
+    curso = models.ForeignKey(Curso, on_delete=models.CASCADE, null=True, blank=True)
     nome = models.CharField(max_length=100)
     periodo = models.CharField(max_length=20)
     abreviatura = models.CharField(max_length=20)

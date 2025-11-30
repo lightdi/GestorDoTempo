@@ -1,5 +1,5 @@
 from django import forms
-from .models import Professor, Disciplinas, Tempo, Aula, Turma, DiaSemana, Semestre, Predio, Sala
+from .models import Professor, Disciplinas, Tempo, Aula, Turma, DiaSemana, Semestre, Predio, Sala, Curso
 
 class BootstrapModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -81,3 +81,9 @@ class SalaForm(BootstrapModelForm):
     class Meta:
         model = Sala
         fields = '__all__'
+
+class CursoForm(BootstrapModelForm):
+    class Meta:
+        model = Curso
+        fields = '__all__'
+
