@@ -9,12 +9,14 @@ from .views import (
     SemestreListView, SemestreCreateView, SemestreUpdateView, SemestreDeleteView,
     PredioListView, PredioCreateView, PredioUpdateView, PredioDeleteView,
     SalaListView, SalaCreateView, SalaUpdateView, SalaDeleteView,
-    create_aula_ajax
+    create_aula_ajax, get_aula_details_ajax, update_aula_ajax
 )
 
 urlpatterns = [
     # AJAX
     path('ajax/create-aula/', create_aula_ajax, name='create_aula_ajax'),
+    path('ajax/get-aula-details/<int:pk>/', get_aula_details_ajax, name='get_aula_details_ajax'),
+    path('ajax/update-aula/', update_aula_ajax, name='update_aula_ajax'),
 
     # Professor
     path('professor/', ProfessorListView.as_view(), name='professor_list'),

@@ -11,16 +11,16 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Descrição</th>
+                        <th>Nome</th>
+                        <th>Posição</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in object_list %}
                     <tr>
-                        <td>{{ item.id }}</td>
-                        <td>{{ item }}</td>
+                        <td>{{ item.nome }}</td>
+                        <td>{{ item.posicao }}</td>
                         <td>
                             <a href="{% url 'diasemana_update' item.pk %}" class="btn btn-sm btn-primary">Editar</a>
                             <a href="{% url 'diasemana_delete' item.pk %}" class="btn btn-sm btn-danger">Excluir</a>

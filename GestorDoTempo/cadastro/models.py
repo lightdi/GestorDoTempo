@@ -22,7 +22,7 @@ class Professor(models.Model):
     dias_proibidos =  models.ManyToManyField('DiaTempoPermitido')
 
     def __str__(self):
-        return self.nome
+        return f"{self.nome} ({self.abreviatura})" 
 
 
 class Disciplinas(models.Model):
@@ -70,7 +70,7 @@ class Aula(models.Model):
     dia = models.PositiveIntegerField(null=True, blank=True)
     horarios = models.ManyToManyField('DiaTempoPermitido', blank=True)
     def __str__(self):
-        return f"{self.disciplina.abreviatura} : {self.professor.abreviatura}"
+        return f"{self.disciplina.abreviatura} ({self.disciplina.quantidade_aulas}) : {self.professor.abreviatura} : {self.sala.nome}"
 
 class Turma(models.Model):
     nome = models.CharField(max_length=100)

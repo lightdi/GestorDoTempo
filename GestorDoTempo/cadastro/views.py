@@ -32,6 +32,42 @@ def create_aula_ajax(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def get_aula_details_ajax(request, pk):
+    try:
+        aula = get_object_or_404(Aula, pk=pk)
+        return JsonResponse({
+            'id': aula.id,
+            'professor_id': aula.professor.id,
+            'disciplina_id': aula.disciplina.id,
+            'sala_id': aula.sala.id
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@require_POST
+def update_aula_ajax(request):
+    try:
+        aula_id = request.POST.get('id')
+        professor_id = request.POST.get('professor')
+        disciplina_id = request.POST.get('disciplina')
+        sala_id = request.POST.get('sala')
+
+        if not all([aula_id, professor_id, disciplina_id, sala_id]):
+            return JsonResponse({'error': 'Todos os campos são obrigatórios.'}, status=400)
+
+        aula = get_object_or_404(Aula, pk=aula_id)
+        aula.professor_id = professor_id
+        aula.disciplina_id = disciplina_id
+        aula.sala_id = sala_id
+        aula.save()
+        
+        return JsonResponse({
+            'id': aula.id,
+            'text': str(aula)
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 # Helper to create views dynamically or just list them out. 
 # Listing them out is explicit and better for maintenance.
 

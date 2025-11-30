@@ -65,12 +65,15 @@
                             </ul>
                         </div>
 
-                        <!-- Create New Aula Inline -->
+                        <!-- Create/Edit Aula Inline -->
                         <div class="card">
-                            <div class="card-header bg-light">
-                                <strong>Nova Aula Rápida</strong>
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <strong id="aula-form-title">Nova Aula Rápida</strong>
+                                <button type="button" id="btn-cancel-edit" class="btn btn-sm btn-outline-secondary"
+                                    style="display: none;">Cancelar Edição</button>
                             </div>
                             <div class="card-body">
+                                <input type="hidden" id="editing-aula-id">
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <select id="new-aula-disciplina" class="form-select">
@@ -97,7 +100,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-1">
-                                        <button type="button" id="btn-create-aula"
+                                        <button type="button" id="btn-save-aula"
                                             class="btn btn-success w-100">+</button>
                                     </div>
                                 </div>
@@ -164,11 +167,14 @@
         const originalSelect = document.getElementById('{{ form.aulas.id_for_label }}');
         const clearBtn = document.getElementById('clear-search');
 
-        // New Aula Elements
-        const btnCreateAula = document.getElementById('btn-create-aula');
+        // New/Edit Aula Elements
+        const btnSaveAula = document.getElementById('btn-save-aula');
+        const btnCancelEdit = document.getElementById('btn-cancel-edit');
         const newDisciplina = document.getElementById('new-aula-disciplina');
         const newProfessor = document.getElementById('new-aula-professor');
         const newSala = document.getElementById('new-aula-sala');
+        const editingIdInput = document.getElementById('editing-aula-id');
+        const formTitle = document.getElementById('aula-form-title');
 
         // Parse available options from the hidden select
         const availableOptions = Array.from(originalSelect.options).map(opt => ({
@@ -190,13 +196,16 @@
                 const li = document.createElement('li');
                 li.className = 'list-group-item d-flex justify-content-between align-items-center';
                 li.innerHTML = `
-                    ${opt.text}
-                    <button type="button" class="btn btn-sm btn-danger remove-aula" data-value="${opt.value}">Remover</button>
+                    <span>${opt.text}</span>
+                    <div>
+                        <button type="button" class="btn btn-sm btn-primary me-2 edit-aula" data-value="${opt.value}">Editar</button>
+                        <button type="button" class="btn btn-sm btn-danger remove-aula" data-value="${opt.value}">Remover</button>
+                    </div>
                 `;
                 selectedList.appendChild(li);
             });
 
-            // Attach event listeners to remove buttons
+            // Attach event listeners
             document.querySelectorAll('.remove-aula').forEach(btn => {
                 btn.addEventListener('click', function () {
                     const value = this.getAttribute('data-value');
@@ -204,14 +213,64 @@
                     if (option) {
                         option.selected = false;
                         renderSelected();
-                        // Re-render search results if search is active to show it's available again
                         if (searchInput.value.trim() !== '') {
                             filterResults(searchInput.value);
                         }
                     }
                 });
             });
+
+            document.querySelectorAll('.edit-aula').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const id = this.getAttribute('data-value');
+                    startEditing(id);
+                });
+            });
         }
+
+        function startEditing(id) {
+            // Reset form first
+            resetForm();
+
+            // Fetch details
+            fetch(`/cadastro/ajax/get-aula-details/${id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Erro ao carregar aula: ' + data.error);
+                        return;
+                    }
+
+                    // Populate form
+                    editingIdInput.value = data.id;
+                    newDisciplina.value = data.disciplina_id;
+                    newProfessor.value = data.professor_id;
+                    newSala.value = data.sala_id;
+
+                    // Update UI state
+                    formTitle.textContent = 'Editar Aula';
+                    btnSaveAula.textContent = 'Salvar';
+                    btnSaveAula.classList.remove('btn-success');
+                    btnSaveAula.classList.add('btn-primary');
+                    btnCancelEdit.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function resetForm() {
+            editingIdInput.value = '';
+            newDisciplina.value = '';
+            newProfessor.value = '';
+            newSala.value = '';
+
+            formTitle.textContent = 'Nova Aula Rápida';
+            btnSaveAula.textContent = '+';
+            btnSaveAula.classList.remove('btn-primary');
+            btnSaveAula.classList.add('btn-success');
+            btnCancelEdit.style.display = 'none';
+        }
+
+        btnCancelEdit.addEventListener('click', resetForm);
 
         function filterResults(query) {
             resultsContainer.innerHTML = '';
@@ -255,11 +314,12 @@
             resultsContainer.style.display = 'none';
         });
 
-        // Create Aula AJAX
-        btnCreateAula.addEventListener('click', function () {
+        // Create/Update Aula AJAX
+        btnSaveAula.addEventListener('click', function () {
             const disciplinaId = newDisciplina.value;
             const professorId = newProfessor.value;
             const salaId = newSala.value;
+            const editingId = editingIdInput.value;
 
             if (!disciplinaId || !professorId || !salaId) {
                 alert('Por favor, selecione Disciplina, Professor e Sala.');
@@ -272,7 +332,13 @@
             formData.append('sala', salaId);
             formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
 
-            fetch('{% url "create_aula_ajax" %}', {
+            let url = '{% url "create_aula_ajax" %}';
+            if (editingId) {
+                url = '{% url "update_aula_ajax" %}';
+                formData.append('id', editingId);
+            }
+
+            fetch(url, {
                 method: 'POST',
                 body: formData
             })
@@ -281,22 +347,26 @@
                     if (data.error) {
                         alert('Erro: ' + data.error);
                     } else {
-                        // Create new option in hidden select
-                        const newOption = new Option(data.text, data.id, true, true);
-                        originalSelect.add(newOption);
+                        if (editingId) {
+                            // Update existing option text
+                            const option = Array.from(originalSelect.options).find(opt => opt.value === editingId);
+                            if (option) {
+                                option.text = data.text;
+                            }
+                        } else {
+                            // Create new option
+                            const newOption = new Option(data.text, data.id, true, true);
+                            originalSelect.add(newOption);
+                        }
 
                         // Update UI
                         renderSelected();
-
-                        // Reset fields
-                        newDisciplina.value = '';
-                        newProfessor.value = '';
-                        newSala.value = '';
+                        resetForm();
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('Erro ao criar aula.');
+                    alert('Erro ao salvar aula.');
                 });
         });
 
