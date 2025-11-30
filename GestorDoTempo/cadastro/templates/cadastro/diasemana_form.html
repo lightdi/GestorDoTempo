@@ -4,17 +4,17 @@
 <div class="row justify-content-center mt-4">
     <div class="col-md-8">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">{{ view.action }} Dia da Semana</h2>
+                <div>
+                    <a href="{% url 'diasemana_list' %}" class="btn btn-light me-2">Cancelar</a>
+                    <button type="submit" form="main-form" class="btn btn-light fw-bold">Salvar</button>
+                </div>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="main-form">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'diasemana_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                    </div>
                 </form>
             </div>
         </div>

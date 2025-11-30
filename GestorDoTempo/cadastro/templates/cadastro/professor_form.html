@@ -2,22 +2,117 @@
 
 {% block content %}
 <div class="row justify-content-center mt-4">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">{{ view.action }} Professor</h2>
+                <div>
+                    <a href="{% url 'professor_list' %}" class="btn btn-light me-2">Cancelar</a>
+                    <button type="submit" form="main-form" class="btn btn-light fw-bold">Salvar</button>
+                </div>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="main-form">
                     {% csrf_token %}
-                    {{ form.as_p }}
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'professor_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+
+                    <!-- Campos básicos -->
+                    <div class="mb-3">
+                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome</label>
+                        {{ form.nome }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.abreviatura.id_for_label }}" class="form-label">Abreviatura</label>
+                        {{ form.abreviatura }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                        {{ form.telefone }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.senha.id_for_label }}" class="form-label">Senha</label>
+                        {{ form.senha }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.cor.id_for_label }}" class="form-label">Cor</label>
+                        {{ form.cor }}
+                    </div>
+
+                    <!-- Grid de Dias/Tempos Proibidos -->
+                    <h4 class="mt-4 mb-3">Dias e Tempos Proibidos</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead>
+                                <tr>
+                                    <th>Tempo / Dia</th>
+                                    {% for dia in dias_semana %}
+                                    <th>
+                                        {{ dia.nome }}
+                                        <br>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1"
+                                            onclick="toggleColumn('{{ dia.id }}')">
+                                            <small>⬇️</small>
+                                        </button>
+                                    </th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in grid_rows %}
+                                <tr>
+                                    <td class="fw-bold">
+                                        {{ row.tempo.nome }} <br> <small>{{ row.tempo.inicio }} - {{ row.tempo.fim
+                                            }}</small>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-1 ms-2"
+                                            onclick="toggleRow(this)">
+                                            <small>➡️</small>
+                                        </button>
+                                    </td>
+                                    {% for slot in row.slots %}
+                                    <td>
+                                        {% if slot.slot_id %}
+                                        <input type="checkbox" name="dias_proibidos" value="{{ slot.slot_id }}"
+                                            class="form-check-input col-dia-{{ slot.dia.id }}" {% if slot.is_checked %}
+                                            checked {% endif %}>
+                                        {% endif %}
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleColumn(diaId) {
+        const checkboxes = document.querySelectorAll('.col-dia-' + diaId);
+        let allChecked = true;
+        checkboxes.forEach(cb => {
+            if (!cb.checked) allChecked = false;
+        });
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+    }
+
+    function toggleRow(btn) {
+        const row = btn.closest('tr');
+        const checkboxes = row.querySelectorAll('input[type="checkbox"]');
+        let allChecked = true;
+        checkboxes.forEach(cb => {
+            if (!cb.checked) allChecked = false;
+        });
+        checkboxes.forEach(cb => {
+            cb.checked = !allChecked;
+        });
+    }
+</script>
 {% endblock %}

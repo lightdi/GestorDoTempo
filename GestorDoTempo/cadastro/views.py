@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Professor, Disciplinas, Tempo, Aula, Turma, DiaSemana, Semestre, Predio, Sala
@@ -6,6 +8,29 @@ from .forms import (
     ProfessorForm, DisciplinasForm, TempoForm, AulaForm, TurmaForm, 
     DiaSemanaForm, SemestreForm, PredioForm, SalaForm
 )
+
+@require_POST
+def create_aula_ajax(request):
+    try:
+        professor_id = request.POST.get('professor')
+        disciplina_id = request.POST.get('disciplina')
+        sala_id = request.POST.get('sala')
+
+        if not all([professor_id, disciplina_id, sala_id]):
+            return JsonResponse({'error': 'Todos os campos são obrigatórios.'}, status=400)
+
+        aula = Aula.objects.create(
+            professor_id=professor_id,
+            disciplina_id=disciplina_id,
+            sala_id=sala_id
+        )
+        
+        return JsonResponse({
+            'id': aula.id,
+            'text': str(aula)
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 # Helper to create views dynamically or just list them out. 
 # Listing them out is explicit and better for maintenance.
@@ -21,11 +46,69 @@ class ProfessorCreateView(CreateView):
     template_name = 'cadastro/professor_form.html'
     success_url = reverse_lazy('professor_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dias = DiaSemana.objects.all().order_by('posicao')
+        tempos = Tempo.objects.all().order_by('posicao')
+        from .models import DiaTempoPermitido
+        slots = DiaTempoPermitido.objects.all()
+        slot_map = {(s.dia_id, s.tempo_id): s.id for s in slots}
+        
+        selected_ids = []
+        if self.object:
+            selected_ids = list(self.object.dias_proibidos.values_list('id', flat=True))
+        
+        grid_rows = []
+        for tempo in tempos:
+            row_slots = []
+            for dia in dias:
+                slot_id = slot_map.get((dia.id, tempo.id))
+                is_checked = slot_id in selected_ids if slot_id else False
+                row_slots.append({
+                    'dia': dia,
+                    'slot_id': slot_id,
+                    'is_checked': is_checked
+                })
+            grid_rows.append({'tempo': tempo, 'slots': row_slots})
+            
+        context['dias_semana'] = dias
+        context['grid_rows'] = grid_rows
+        return context
+
 class ProfessorUpdateView(UpdateView):
     model = Professor
     form_class = ProfessorForm
     template_name = 'cadastro/professor_form.html'
     success_url = reverse_lazy('professor_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dias = DiaSemana.objects.all().order_by('posicao')
+        tempos = Tempo.objects.all().order_by('posicao')
+        from .models import DiaTempoPermitido
+        slots = DiaTempoPermitido.objects.all()
+        slot_map = {(s.dia_id, s.tempo_id): s.id for s in slots}
+        
+        selected_ids = []
+        if self.object:
+            selected_ids = list(self.object.dias_proibidos.values_list('id', flat=True))
+            
+        grid_rows = []
+        for tempo in tempos:
+            row_slots = []
+            for dia in dias:
+                slot_id = slot_map.get((dia.id, tempo.id))
+                is_checked = slot_id in selected_ids if slot_id else False
+                row_slots.append({
+                    'dia': dia,
+                    'slot_id': slot_id,
+                    'is_checked': is_checked
+                })
+            grid_rows.append({'tempo': tempo, 'slots': row_slots})
+            
+        context['dias_semana'] = dias
+        context['grid_rows'] = grid_rows
+        return context
 
 class ProfessorDeleteView(DeleteView):
     model = Professor
@@ -87,11 +170,69 @@ class AulaCreateView(CreateView):
     template_name = 'cadastro/aula_form.html'
     success_url = reverse_lazy('aula_list')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dias = DiaSemana.objects.all().order_by('posicao')
+        tempos = Tempo.objects.all().order_by('posicao')
+        from .models import DiaTempoPermitido
+        slots = DiaTempoPermitido.objects.all()
+        slot_map = {(s.dia_id, s.tempo_id): s.id for s in slots}
+        
+        selected_ids = []
+        if self.object:
+            selected_ids = list(self.object.horarios.values_list('id', flat=True))
+        
+        grid_rows = []
+        for tempo in tempos:
+            row_slots = []
+            for dia in dias:
+                slot_id = slot_map.get((dia.id, tempo.id))
+                is_checked = slot_id in selected_ids if slot_id else False
+                row_slots.append({
+                    'dia': dia,
+                    'slot_id': slot_id,
+                    'is_checked': is_checked
+                })
+            grid_rows.append({'tempo': tempo, 'slots': row_slots})
+            
+        context['dias_semana'] = dias
+        context['grid_rows'] = grid_rows
+        return context
+
 class AulaUpdateView(UpdateView):
     model = Aula
     form_class = AulaForm
     template_name = 'cadastro/aula_form.html'
     success_url = reverse_lazy('aula_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        dias = DiaSemana.objects.all().order_by('posicao')
+        tempos = Tempo.objects.all().order_by('posicao')
+        from .models import DiaTempoPermitido
+        slots = DiaTempoPermitido.objects.all()
+        slot_map = {(s.dia_id, s.tempo_id): s.id for s in slots}
+        
+        selected_ids = []
+        if self.object:
+            selected_ids = list(self.object.horarios.values_list('id', flat=True))
+            
+        grid_rows = []
+        for tempo in tempos:
+            row_slots = []
+            for dia in dias:
+                slot_id = slot_map.get((dia.id, tempo.id))
+                is_checked = slot_id in selected_ids if slot_id else False
+                row_slots.append({
+                    'dia': dia,
+                    'slot_id': slot_id,
+                    'is_checked': is_checked
+                })
+            grid_rows.append({'tempo': tempo, 'slots': row_slots})
+            
+        context['dias_semana'] = dias
+        context['grid_rows'] = grid_rows
+        return context
 
 class AulaDeleteView(DeleteView):
     model = Aula
@@ -137,6 +278,9 @@ class TurmaCreateView(CreateView):
             
         context['dias_semana'] = dias
         context['grid_rows'] = grid_rows
+        context['professores'] = Professor.objects.all()
+        context['disciplinas'] = Disciplinas.objects.all()
+        context['salas'] = Sala.objects.all()
         return context
 
 class TurmaUpdateView(UpdateView):
@@ -172,6 +316,9 @@ class TurmaUpdateView(UpdateView):
             
         context['dias_semana'] = dias
         context['grid_rows'] = grid_rows
+        context['professores'] = Professor.objects.all()
+        context['disciplinas'] = Disciplinas.objects.all()
+        context['salas'] = Sala.objects.all()
         return context
 
 class TurmaDeleteView(DeleteView):

@@ -27,7 +27,6 @@ class DisciplinasForm(BootstrapModelForm):
         model = Disciplinas
         fields = '__all__'
         widgets = {
-            'dias_proibidos': forms.CheckboxSelectMultiple,
             'cor': forms.TextInput(attrs={'type': 'color'}),
         }
 
@@ -44,13 +43,15 @@ class AulaForm(BootstrapModelForm):
     class Meta:
         model = Aula
         fields = '__all__'
+        widgets = {
+            'horarios': forms.CheckboxSelectMultiple,
+        }
 
 class TurmaForm(BootstrapModelForm):
     class Meta:
         model = Turma
         fields = '__all__'
         widgets = {
-            'aulas': forms.CheckboxSelectMultiple,
             'dias': forms.CheckboxSelectMultiple,
             'cor': forms.TextInput(attrs={'type': 'color'}),
         }

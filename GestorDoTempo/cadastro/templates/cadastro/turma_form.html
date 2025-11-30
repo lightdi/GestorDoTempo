@@ -4,11 +4,15 @@
 <div class="row justify-content-center mt-4">
     <div class="col-md-10">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">{{ view.action }} Turma</h2>
+                <div>
+                    <a href="{% url 'turma_list' %}" class="btn btn-light me-2">Cancelar</a>
+                    <button type="submit" form="main-form" class="btn btn-light fw-bold">Salvar</button>
+                </div>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" id="main-form">
                     {% csrf_token %}
 
                     <!-- Campos básicos -->
@@ -27,6 +31,78 @@
                     <div class="mb-3">
                         <label for="{{ form.cor.id_for_label }}" class="form-label">Cor</label>
                         {{ form.cor }}
+                    </div>
+
+                    <!-- Aulas (Search and Add) -->
+                    <div class="mb-3 mt-4">
+                        <label class="form-label">Aulas</label>
+
+                        <!-- Hidden original select -->
+                        <div class="d-none">
+                            {{ form.aulas }}
+                        </div>
+
+                        <!-- Search Interface -->
+                        <div class="input-group mb-2">
+                            <input type="text" id="search-aula" class="form-control"
+                                placeholder="Pesquisar aula (Disciplina - Professor)...">
+                            <button class="btn btn-outline-secondary" type="button" id="clear-search">Limpar</button>
+                        </div>
+
+                        <!-- Search Results -->
+                        <div id="aula-results" class="list-group mb-3"
+                            style="max-height: 200px; overflow-y: auto; display: none;">
+                            <!-- Results will be injected here via JS -->
+                        </div>
+
+                        <!-- Selected Aulas List -->
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                Aulas Selecionadas
+                            </div>
+                            <ul id="selected-aulas-list" class="list-group list-group-flush">
+                                <!-- Selected items will be injected here via JS -->
+                            </ul>
+                        </div>
+
+                        <!-- Create New Aula Inline -->
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <strong>Nova Aula Rápida</strong>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <select id="new-aula-disciplina" class="form-select">
+                                            <option value="">Selecione a Disciplina</option>
+                                            {% for d in disciplinas %}
+                                            <option value="{{ d.id }}">{{ d.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <select id="new-aula-professor" class="form-select">
+                                            <option value="">Selecione o Professor</option>
+                                            {% for p in professores %}
+                                            <option value="{{ p.id }}">{{ p.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <select id="new-aula-sala" class="form-select">
+                                            <option value="">Selecione a Sala</option>
+                                            {% for s in salas %}
+                                            <option value="{{ s.id }}">{{ s.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" id="btn-create-aula"
+                                            class="btn btn-success w-100">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Grid de Dias/Tempos Permitidos -->
@@ -63,8 +139,8 @@
                                     <td>
                                         {% if slot.slot_id %}
                                         <input type="checkbox" name="dias" value="{{ slot.slot_id }}"
-                                            class="form-check-input col-dia-{{ slot.dia.id }}" {% if slot.is_checked
-                                            %}checked{% endif %}>
+                                            class="form-check-input col-dia-{{ slot.dia.id }}" {% if slot.is_checked %}
+                                            checked {% endif %}>
                                         {% endif %}
                                     </td>
                                     {% endfor %}
@@ -73,19 +149,6 @@
                             </tbody>
                         </table>
                     </div>
-
-                    <!-- Aulas (Lista) -->
-                    <div class="mb-3 mt-4">
-                        <label class="form-label">Aulas</label>
-                        <div class="card p-3" style="max-height: 200px; overflow-y: auto;">
-                            {{ form.aulas }}
-                        </div>
-                    </div>
-
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{% url 'turma_list' %}" class="btn btn-secondary me-md-2">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
-                    </div>
                 </form>
             </div>
         </div>
@@ -93,6 +156,154 @@
 </div>
 
 <script>
+    // Aula Search and Add Logic
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-aula');
+        const resultsContainer = document.getElementById('aula-results');
+        const selectedList = document.getElementById('selected-aulas-list');
+        const originalSelect = document.getElementById('{{ form.aulas.id_for_label }}');
+        const clearBtn = document.getElementById('clear-search');
+
+        // New Aula Elements
+        const btnCreateAula = document.getElementById('btn-create-aula');
+        const newDisciplina = document.getElementById('new-aula-disciplina');
+        const newProfessor = document.getElementById('new-aula-professor');
+        const newSala = document.getElementById('new-aula-sala');
+
+        // Parse available options from the hidden select
+        const availableOptions = Array.from(originalSelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.text,
+            selected: opt.selected
+        }));
+
+        function renderSelected() {
+            selectedList.innerHTML = '';
+            const selectedOptions = Array.from(originalSelect.options).filter(opt => opt.selected);
+
+            if (selectedOptions.length === 0) {
+                selectedList.innerHTML = '<li class="list-group-item text-muted">Nenhuma aula selecionada.</li>';
+                return;
+            }
+
+            selectedOptions.forEach(opt => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    ${opt.text}
+                    <button type="button" class="btn btn-sm btn-danger remove-aula" data-value="${opt.value}">Remover</button>
+                `;
+                selectedList.appendChild(li);
+            });
+
+            // Attach event listeners to remove buttons
+            document.querySelectorAll('.remove-aula').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const value = this.getAttribute('data-value');
+                    const option = Array.from(originalSelect.options).find(opt => opt.value === value);
+                    if (option) {
+                        option.selected = false;
+                        renderSelected();
+                        // Re-render search results if search is active to show it's available again
+                        if (searchInput.value.trim() !== '') {
+                            filterResults(searchInput.value);
+                        }
+                    }
+                });
+            });
+        }
+
+        function filterResults(query) {
+            resultsContainer.innerHTML = '';
+            if (!query) {
+                resultsContainer.style.display = 'none';
+                return;
+            }
+
+            const lowerQuery = query.toLowerCase();
+            const matches = Array.from(originalSelect.options).filter(opt =>
+                !opt.selected && opt.text.toLowerCase().includes(lowerQuery)
+            );
+
+            if (matches.length === 0) {
+                resultsContainer.innerHTML = '<div class="list-group-item text-muted">Nenhuma aula encontrada.</div>';
+            } else {
+                matches.forEach(opt => {
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.className = 'list-group-item list-group-item-action';
+                    a.textContent = opt.text;
+                    a.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        opt.selected = true;
+                        searchInput.value = ''; // Clear search after selection
+                        resultsContainer.style.display = 'none';
+                        renderSelected();
+                    });
+                    resultsContainer.appendChild(a);
+                });
+            }
+            resultsContainer.style.display = 'block';
+        }
+
+        searchInput.addEventListener('input', function () {
+            filterResults(this.value);
+        });
+
+        clearBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            resultsContainer.style.display = 'none';
+        });
+
+        // Create Aula AJAX
+        btnCreateAula.addEventListener('click', function () {
+            const disciplinaId = newDisciplina.value;
+            const professorId = newProfessor.value;
+            const salaId = newSala.value;
+
+            if (!disciplinaId || !professorId || !salaId) {
+                alert('Por favor, selecione Disciplina, Professor e Sala.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('disciplina', disciplinaId);
+            formData.append('professor', professorId);
+            formData.append('sala', salaId);
+            formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+            fetch('{% url "create_aula_ajax" %}', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('Erro: ' + data.error);
+                    } else {
+                        // Create new option in hidden select
+                        const newOption = new Option(data.text, data.id, true, true);
+                        originalSelect.add(newOption);
+
+                        // Update UI
+                        renderSelected();
+
+                        // Reset fields
+                        newDisciplina.value = '';
+                        newProfessor.value = '';
+                        newSala.value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Erro ao criar aula.');
+                });
+        });
+
+        // Initial render
+        renderSelected();
+    });
+
     function toggleColumn(diaId) {
         const checkboxes = document.querySelectorAll('.col-dia-' + diaId);
         // Check if all are checked to decide whether to uncheck or check all

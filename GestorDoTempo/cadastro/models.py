@@ -19,7 +19,7 @@ class Professor(models.Model):
     email = models.EmailField()
     senha = models.CharField(max_length=100)
     cor = models.CharField(max_length=20)
-    dias_proibidos = models.ManyToManyField('DiaSemana')
+    dias_proibidos =  models.ManyToManyField('DiaTempoPermitido')
 
     def __str__(self):
         return self.nome
@@ -32,7 +32,6 @@ class Disciplinas(models.Model):
     horas_aula = models.PositiveIntegerField()
     horas_relogio = models.PositiveIntegerField()
     cor = models.CharField(max_length=20)  # exemplo: #FF0000 ou "azul"
-    dias_proibidos = models.ManyToManyField('DiaSemana')
     def __str__(self):
         return self.nome
 
@@ -66,9 +65,12 @@ class DiaTempoPermitido(models.Model):
 class Aula(models.Model):
     professor = models.ForeignKey(Professor, on_delete=models.CASCADE)
     disciplina = models.ForeignKey(Disciplinas, on_delete=models.CASCADE)
-    tempo = models.ForeignKey(Tempo, on_delete=models.CASCADE)    
+    tempo = models.ForeignKey(Tempo, on_delete=models.CASCADE, null=True, blank=True)    
     sala = models.ForeignKey('Sala', on_delete=models.CASCADE)
-    dia = models.PositiveIntegerField()
+    dia = models.PositiveIntegerField(null=True, blank=True)
+    horarios = models.ManyToManyField('DiaTempoPermitido', blank=True)
+    def __str__(self):
+        return f"{self.disciplina.abreviatura} : {self.professor.abreviatura}"
 
 class Turma(models.Model):
     nome = models.CharField(max_length=100)
