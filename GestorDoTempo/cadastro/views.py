@@ -180,6 +180,8 @@ class DisciplinasListView(ListView):
         if q and filter_by:
             if filter_by == 'nome':
                 queryset = queryset.filter(nome__icontains=q)
+            elif filter_by == 'curso':
+                queryset = queryset.filter(curso__nome__icontains=q)
             elif filter_by == 'abreviatura':
                 queryset = queryset.filter(abreviatura__icontains=q)
         return queryset
@@ -384,7 +386,8 @@ class TurmaCreateView(CreateView):
         context['dias_semana'] = dias
         context['grid_rows'] = grid_rows
         context['professores'] = Professor.objects.all()
-        context['disciplinas'] = Disciplinas.objects.all()
+        context['disciplinas'] = Disciplinas.objects.all().order_by('nome')
+        context['cursos'] = Curso.objects.all()
         context['salas'] = Sala.objects.all()
         return context
 
@@ -421,8 +424,9 @@ class TurmaUpdateView(UpdateView):
             
         context['dias_semana'] = dias
         context['grid_rows'] = grid_rows
-        context['professores'] = Professor.objects.all()
-        context['disciplinas'] = Disciplinas.objects.all()
+        context['professores'] = Professor.objects.all().order_by('nome')
+        context['disciplinas'] = Disciplinas.objects.all().order_by('nome')
+        context['cursos'] = Curso.objects.all()
         context['salas'] = Sala.objects.all()
         return context
 

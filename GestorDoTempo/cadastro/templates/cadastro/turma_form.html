@@ -21,6 +21,10 @@
                         {{ form.nome }}
                     </div>
                     <div class="mb-3">
+                        <label for="{{ form.curso.id_for_label }}" class="form-label">Curso</label>
+                        {{ form.curso }}
+                    </div>
+                    <div class="mb-3">
                         <label for="{{ form.periodo.id_for_label }}" class="form-label">Período</label>
                         {{ form.periodo }}
                     </div>
@@ -57,8 +61,8 @@
 
                         <!-- Selected Aulas List -->
                         <div class="card mb-3">
-                            <div class="card-header bg-light">
-                                Aulas Selecionadas
+                            <div class="card-header bg-light text-dark">
+                                <strong>Aulas Selecionadas</strong>
                             </div>
                             <ul id="selected-aulas-list" class="list-group list-group-flush">
                                 <!-- Selected items will be injected here via JS -->
@@ -67,19 +71,35 @@
 
                         <!-- Create/Edit Aula Inline -->
                         <div class="card">
-                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <div
+                                class="card-header bg-light d-flex justify-content-between align-items-center text-dark">
                                 <strong id="aula-form-title">Nova Aula Rápida</strong>
                                 <button type="button" id="btn-cancel-edit" class="btn btn-sm btn-outline-secondary"
                                     style="display: none;">Cancelar Edição</button>
                             </div>
                             <div class="card-body">
                                 <input type="hidden" id="editing-aula-id">
+
+                                <!-- Filtro de Curso para Disciplinas -->
+                                <div class="mb-2">
+                                    <label for="filter-curso" class="form-label small text-muted">Filtrar Disciplinas
+                                        por Curso:</label>
+                                    <select id="filter-curso" class="form-select form-select-sm">
+                                        <option value="todos">Todos os Cursos</option>
+                                        <option value="geral">Geral (Sem Curso)</option>
+                                        {% for c in cursos %}
+                                        <option value="{{ c.id }}">{{ c.nome }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+
                                 <div class="row g-2">
                                     <div class="col-md-4">
                                         <select id="new-aula-disciplina" class="form-select">
                                             <option value="">Selecione a Disciplina</option>
                                             {% for d in disciplinas %}
-                                            <option value="{{ d.id }}">{{ d.nome }}</option>
+                                            <option value="{{ d.id }}" data-curso-id="{{ d.curso.id|default:'geral' }}">
+                                                {{ d.nome }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
@@ -176,6 +196,50 @@
         const editingIdInput = document.getElementById('editing-aula-id');
         const formTitle = document.getElementById('aula-form-title');
 
+        // Filter Elements
+        const filterCurso = document.getElementById('filter-curso');
+        // Store original options for filtering
+        const originalDisciplinaOptions = Array.from(newDisciplina.options);
+
+        // Filter Logic
+        filterCurso.addEventListener('change', function () {
+            const selectedCurso = this.value;
+            const currentSelectedDisciplina = newDisciplina.value;
+
+            // Clear current options
+            newDisciplina.innerHTML = '';
+
+            originalDisciplinaOptions.forEach(opt => {
+                // Always include the placeholder
+                if (opt.value === "") {
+                    newDisciplina.appendChild(opt);
+                    return;
+                }
+
+                const cursoId = opt.getAttribute('data-curso-id');
+                let show = false;
+
+                if (selectedCurso === 'todos') {
+                    show = true;
+                } else if (selectedCurso === 'geral') {
+                    if (cursoId === 'geral' || !cursoId) show = true;
+                } else {
+                    if (cursoId === selectedCurso) show = true;
+                }
+
+                if (show) {
+                    newDisciplina.appendChild(opt);
+                }
+            });
+
+            // Try to preserve selection if visible, otherwise select placeholder
+            if (Array.from(newDisciplina.options).some(opt => opt.value === currentSelectedDisciplina)) {
+                newDisciplina.value = currentSelectedDisciplina;
+            } else {
+                newDisciplina.value = "";
+            }
+        });
+
         // Parse available options from the hidden select
         const availableOptions = Array.from(originalSelect.options).map(opt => ({
             value: opt.value,
@@ -243,6 +307,12 @@
 
                     // Populate form
                     editingIdInput.value = data.id;
+
+                    // Note: If the discipline is hidden by the current filter, we should probably reset the filter or show it temporarily.
+                    // For simplicity, let's reset filter to 'todos' to ensure the option exists
+                    filterCurso.value = 'todos';
+                    filterCurso.dispatchEvent(new Event('change'));
+
                     newDisciplina.value = data.disciplina_id;
                     newProfessor.value = data.professor_id;
                     newSala.value = data.sala_id;

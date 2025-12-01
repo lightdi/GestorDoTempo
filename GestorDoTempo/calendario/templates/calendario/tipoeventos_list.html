@@ -1,24 +1,16 @@
 {% extends 'base.html' %}
-{% load cadastro_extras %}
 
 {% block content %}
 <div class="card mt-4">
     <div class="card-header d-flex justify-content-between align-items-center">
-        <h2 class="mb-0">Lista de Disciplinas</h2>
-        <a href="{% url 'disciplinas_create' %}" class="btn btn-light text-success fw-bold">Novo Disciplinas</a>
+        <h2 class="mb-0">Lista de Tipos de Eventos</h2>
+        <a href="{% url 'tipoeventos_create' %}" class="btn btn-light text-success fw-bold">Novo Tipo</a>
     </div>
     <div class="card-body">
         <form method="get" class="row g-3 mb-3 align-items-center">
             <div class="col-auto">
-                <select name="filter_by" class="form-select">
-                    <option value="nome" {% is_selected request.GET.filter_by 'nome' %}>Nome</option>
-                    <option value="curso" {% is_selected request.GET.filter_by 'curso' %}>Curso</option>
-                    <option value="abreviatura" {% is_selected request.GET.filter_by 'abreviatura' %}>Abreviatura
-                    </option>
-                </select>
-            </div>
-            <div class="col-auto">
-                <input type="text" name="q" class="form-control" placeholder="Pesquisar..." value="{{ request.GET.q }}">
+                <input type="text" name="q" class="form-control" placeholder="Pesquisar por nome..."
+                    value="{{ request.GET.q }}">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Pesquisar</button>
@@ -34,9 +26,9 @@
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>Curso</th>
-                        <th>Abreviatura</th>
-                        <th>Qtd. Aulas</th>
+                        <th>Cor</th>
+                        <th>Integrado</th>
+                        <th>Superior</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -44,12 +36,15 @@
                     {% for item in object_list %}
                     <tr>
                         <td>{{ item.nome }}</td>
-                        <td>{{ item.curso.nome|default:"-" }}</td>
-                        <td>{{ item.abreviatura }}</td>
-                        <td>{{ item.quantidade_aulas }}</td>
                         <td>
-                            <a href="{% url 'disciplinas_update' item.pk %}" class="btn btn-sm btn-primary">Editar</a>
-                            <a href="{% url 'disciplinas_delete' item.pk %}" class="btn btn-sm btn-danger">Excluir</a>
+                            <span class="badge" style="background-color: {{ item.cor }}; color: white;">{{ item.cor
+                                }}</span>
+                        </td>
+                        <td>{{ item.integrado|yesno:"Sim,Não" }}</td>
+                        <td>{{ item.superior|yesno:"Sim,Não" }}</td>
+                        <td>
+                            <a href="{% url 'tipoeventos_update' item.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                            <a href="{% url 'tipoeventos_delete' item.pk %}" class="btn btn-sm btn-danger">Excluir</a>
                         </td>
                     </tr>
                     {% empty %}

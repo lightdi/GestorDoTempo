@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0">Excluir Feriado</h2>
+            </div>
+            <div class="card-body">
+                <p>Tem certeza que deseja excluir o feriado "{{ object.title }}"?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <a href="{% url 'feriado_list' %}" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

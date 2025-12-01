@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">{{ view.action }} Tipo de Evento</h2>
+                <div>
+                    <a href="{% url 'tipoeventos_list' %}" class="btn btn-light me-2">Cancelar</a>
+                    <button type="submit" form="main-form" class="btn btn-light fw-bold">Salvar</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" id="main-form">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

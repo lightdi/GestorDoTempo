@@ -57,16 +57,38 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'professor_list' %}">Professores</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'disciplinas_list' %}">Disciplinas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'tempo_list' %}">Tempos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'aula_list' %}">Aulas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'turma_list' %}">Turmas</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'curso_list' %}">Cursos</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'diasemana_list' %}">Dias da Semana</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'semestre_list' %}">Semestres</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'predio_list' %}">Prédios</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'sala_list' %}">Salas</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCadastro" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Cadastro
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownCadastro">
+                            <li><a class="dropdown-item" href="{% url 'professor_list' %}">Professores</a></li>
+                            <li><a class="dropdown-item" href="{% url 'disciplinas_list' %}">Disciplinas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tempo_list' %}">Tempos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'aula_list' %}">Aulas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'turma_list' %}">Turmas</a></li>
+                            <li><a class="dropdown-item" href="{% url 'curso_list' %}">Cursos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'diasemana_list' %}">Dias da Semana</a></li>
+                            <li><a class="dropdown-item" href="{% url 'semestre_list' %}">Semestres</a></li>
+                            <li><a class="dropdown-item" href="{% url 'predio_list' %}">Prédios</a></li>
+                            <li><a class="dropdown-item" href="{% url 'sala_list' %}">Salas</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownCalendario" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Calendário
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownCalendario">
+                            <li><a class="dropdown-item" href="{% url 'index' %}">Calendário</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'tipoeventos_list' %}">Tipos de Eventos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'event_list' %}">Eventos</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

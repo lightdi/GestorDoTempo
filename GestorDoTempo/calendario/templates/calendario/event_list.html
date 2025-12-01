@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="mb-0">Lista de Eventos</h2>
+        <a href="{% url 'event_create' %}" class="btn btn-light text-success fw-bold">Novo Evento</a>
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3 mb-3 align-items-center">
+            <div class="col-auto">
+                <input type="text" name="q" class="form-control" placeholder="Pesquisar por título..."
+                    value="{{ request.GET.q }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">Pesquisar</button>
+            </div>
+            {% if request.GET.q %}
+            <div class="col-auto">
+                <a href="?" class="btn btn-secondary">Limpar</a>
+            </div>
+            {% endif %}
+        </form>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Curso</th>
+                        <th>Turma</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in object_list %}
+                    <tr>
+                        <td>{{ item.title }}</td>
+                        <td>
+                            <span class="badge" style="background-color: {{ item.tipo.cor }}; color: white;">{{
+                                item.tipo.nome }}</span>
+                        </td>
+                        <td>{{ item.curso|default:"-" }}</td>
+                        <td>{{ item.turma|default:"-" }}</td>
+                        <td>{{ item.data_inicio }}</td>
+                        <td>{{ item.data_fim }}</td>
+                        <td>
+                            <a href="{% url 'event_update' item.pk %}" class="btn btn-sm btn-primary">Editar</a>
+                            <a href="{% url 'event_delete' item.pk %}" class="btn btn-sm btn-danger">Excluir</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">Nenhum registro encontrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include 'cadastro/pagination.html' %}
+    </div>
+</div>
+{% endblock %}
