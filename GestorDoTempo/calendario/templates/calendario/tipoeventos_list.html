@@ -10,7 +10,7 @@
         <form method="get" class="row g-3 mb-3 align-items-center">
             <div class="col-auto">
                 <input type="text" name="q" class="form-control" placeholder="Pesquisar por nome..."
-                    value="{{ request.GET.q }}">
+                    value="{{ request.GET.q|default:'' }}">
             </div>
             <div class="col-auto">
                 <button type="submit" class="btn btn-primary">Pesquisar</button>
@@ -37,8 +37,10 @@
                     <tr>
                         <td>{{ item.nome }}</td>
                         <td>
-                            <span class="badge" style="background-color: {{ item.cor }}; color: white;">{{ item.cor
-                                }}</span>
+                            <span class="badge"
+                                style="background-color: {{ item.cor|default:'#6c757d' }}; color: white; text-shadow: 0px 0px 3px black;">
+                                {{ item.cor }}
+                            </span>
                         </td>
                         <td>{{ item.integrado|yesno:"Sim,Não" }}</td>
                         <td>{{ item.superior|yesno:"Sim,Não" }}</td>

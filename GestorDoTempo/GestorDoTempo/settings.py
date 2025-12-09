@@ -112,6 +112,11 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'core.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -121,7 +126,9 @@ TIME_ZONE = 'America/Fortaleza'
 USE_I18N = True
 USE_TZ = True
 
-LOGIN_URL = '/admin/login/'
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'index'
 
 
 # Static files (CSS, JavaScript, Images)

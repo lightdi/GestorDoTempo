@@ -23,5 +23,13 @@ class Event(models.Model):
     curso = models.ForeignKey(Curso, on_delete=models.CASCADE, null=True, blank=True)
     turma = models.ForeignKey(Turma, on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    data_inicio = models.DateField(default=timezone.now)
-    data_fim = models.DateField(default=timezone.now)
+
+class EventDate(models.Model):
+    event = models.ForeignKey(Event, related_name='dates', on_delete=models.CASCADE)
+    date = models.DateField()
+    
+    class Meta:
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.event.title} - {self.date}"

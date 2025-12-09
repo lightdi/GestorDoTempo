@@ -15,13 +15,11 @@ class TipoEventosForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['title', 'tipo', 'curso', 'turma', 'data_inicio', 'data_fim', 'description']
+        fields = ['title', 'tipo', 'curso', 'turma', 'description']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'curso': forms.Select(attrs={'class': 'form-select'}),
             'turma': forms.Select(attrs={'class': 'form-select'}),
             'tipo': forms.Select(attrs={'class': 'form-select'}),
-            'data_inicio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'data_fim': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }

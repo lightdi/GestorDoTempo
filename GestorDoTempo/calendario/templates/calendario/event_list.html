@@ -29,8 +29,7 @@
                         <th>Tipo</th>
                         <th>Curso</th>
                         <th>Turma</th>
-                        <th>Início</th>
-                        <th>Fim</th>
+                        <th>Datas</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -44,8 +43,14 @@
                         </td>
                         <td>{{ item.curso|default:"-" }}</td>
                         <td>{{ item.turma|default:"-" }}</td>
-                        <td>{{ item.data_inicio }}</td>
-                        <td>{{ item.data_fim }}</td>
+                        <td>
+                            {{ item.dates.count }} dia(s)
+                            {% with next_date=item.dates.first %}
+                            {% if next_date %}
+                            <br><small class="text-muted">Próximo: {{ next_date.date }}</small>
+                            {% endif %}
+                            {% endwith %}
+                        </td>
                         <td>
                             <a href="{% url 'event_update' item.pk %}" class="btn btn-sm btn-primary">Editar</a>
                             <a href="{% url 'event_delete' item.pk %}" class="btn btn-sm btn-danger">Excluir</a>
@@ -53,7 +58,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="text-center">Nenhum registro encontrado.</td>
+                        <td colspan="6" class="text-center">Nenhum registro encontrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

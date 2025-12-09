@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -72,7 +73,7 @@ def update_aula_ajax(request):
 # Listing them out is explicit and better for maintenance.
 
 # Professor
-class ProfessorListView(ListView):
+class ProfessorListView(LoginRequiredMixin, ListView):
     model = Professor
     template_name = 'cadastro/professor_list.html'
     paginate_by = 10
@@ -91,7 +92,7 @@ class ProfessorListView(ListView):
                 queryset = queryset.filter(email__icontains=q)
         return queryset
 
-class ProfessorCreateView(CreateView):
+class ProfessorCreateView(LoginRequiredMixin, CreateView):
     model = Professor
     form_class = ProfessorForm
     template_name = 'cadastro/professor_form.html'
@@ -126,7 +127,7 @@ class ProfessorCreateView(CreateView):
         context['grid_rows'] = grid_rows
         return context
 
-class ProfessorUpdateView(UpdateView):
+class ProfessorUpdateView(LoginRequiredMixin, UpdateView):
     model = Professor
     form_class = ProfessorForm
     template_name = 'cadastro/professor_form.html'
@@ -161,13 +162,13 @@ class ProfessorUpdateView(UpdateView):
         context['grid_rows'] = grid_rows
         return context
 
-class ProfessorDeleteView(DeleteView):
+class ProfessorDeleteView(LoginRequiredMixin, DeleteView):
     model = Professor
     template_name = 'cadastro/professor_confirm_delete.html'
     success_url = reverse_lazy('professor_list')
 
 # Disciplinas
-class DisciplinasListView(ListView):
+class DisciplinasListView(LoginRequiredMixin, ListView):
     model = Disciplinas
     template_name = 'cadastro/disciplinas_list.html'
     paginate_by = 10
@@ -186,25 +187,25 @@ class DisciplinasListView(ListView):
                 queryset = queryset.filter(abreviatura__icontains=q)
         return queryset
 
-class DisciplinasCreateView(CreateView):
+class DisciplinasCreateView(LoginRequiredMixin, CreateView):
     model = Disciplinas
     form_class = DisciplinasForm
     template_name = 'cadastro/disciplinas_form.html'
     success_url = reverse_lazy('disciplinas_list')
 
-class DisciplinasUpdateView(UpdateView):
+class DisciplinasUpdateView(LoginRequiredMixin, UpdateView):
     model = Disciplinas
     form_class = DisciplinasForm
     template_name = 'cadastro/disciplinas_form.html'
     success_url = reverse_lazy('disciplinas_list')
 
-class DisciplinasDeleteView(DeleteView):
+class DisciplinasDeleteView(LoginRequiredMixin, DeleteView):
     model = Disciplinas
     template_name = 'cadastro/disciplinas_confirm_delete.html'
     success_url = reverse_lazy('disciplinas_list')
 
 # Tempo
-class TempoListView(ListView):
+class TempoListView(LoginRequiredMixin, ListView):
     model = Tempo
     template_name = 'cadastro/tempo_list.html'
     paginate_by = 10
@@ -219,25 +220,25 @@ class TempoListView(ListView):
                 queryset = queryset.filter(nome__icontains=q)
         return queryset
 
-class TempoCreateView(CreateView):
+class TempoCreateView(LoginRequiredMixin, CreateView):
     model = Tempo
     form_class = TempoForm
     template_name = 'cadastro/tempo_form.html'
     success_url = reverse_lazy('tempo_list')
 
-class TempoUpdateView(UpdateView):
+class TempoUpdateView(LoginRequiredMixin, UpdateView):
     model = Tempo
     form_class = TempoForm
     template_name = 'cadastro/tempo_form.html'
     success_url = reverse_lazy('tempo_list')
 
-class TempoDeleteView(DeleteView):
+class TempoDeleteView(LoginRequiredMixin, DeleteView):
     model = Tempo
     template_name = 'cadastro/tempo_confirm_delete.html'
     success_url = reverse_lazy('tempo_list')
 
 # Aula
-class AulaListView(ListView):
+class AulaListView(LoginRequiredMixin, ListView):
     model = Aula
     template_name = 'cadastro/aula_list.html'
     paginate_by = 10
@@ -256,7 +257,7 @@ class AulaListView(ListView):
                 queryset = queryset.filter(sala__nome__icontains=q)
         return queryset
 
-class AulaCreateView(CreateView):
+class AulaCreateView(LoginRequiredMixin, CreateView):
     model = Aula
     form_class = AulaForm
     template_name = 'cadastro/aula_form.html'
@@ -291,7 +292,7 @@ class AulaCreateView(CreateView):
         context['grid_rows'] = grid_rows
         return context
 
-class AulaUpdateView(UpdateView):
+class AulaUpdateView(LoginRequiredMixin, UpdateView):
     model = Aula
     form_class = AulaForm
     template_name = 'cadastro/aula_form.html'
@@ -326,13 +327,13 @@ class AulaUpdateView(UpdateView):
         context['grid_rows'] = grid_rows
         return context
 
-class AulaDeleteView(DeleteView):
+class AulaDeleteView(LoginRequiredMixin, DeleteView):
     model = Aula
     template_name = 'cadastro/aula_confirm_delete.html'
     success_url = reverse_lazy('aula_list')
 
 # Turma
-class TurmaListView(ListView):
+class TurmaListView(LoginRequiredMixin, ListView):
     model = Turma
     template_name = 'cadastro/turma_list.html'
     paginate_by = 10
@@ -351,7 +352,7 @@ class TurmaListView(ListView):
                 queryset = queryset.filter(abreviatura__icontains=q)
         return queryset
 
-class TurmaCreateView(CreateView):
+class TurmaCreateView(LoginRequiredMixin, CreateView):
     model = Turma
     form_class = TurmaForm
     template_name = 'cadastro/turma_form.html'
@@ -391,7 +392,7 @@ class TurmaCreateView(CreateView):
         context['salas'] = Sala.objects.all()
         return context
 
-class TurmaUpdateView(UpdateView):
+class TurmaUpdateView(LoginRequiredMixin, UpdateView):
     model = Turma
     form_class = TurmaForm
     template_name = 'cadastro/turma_form.html'
@@ -430,13 +431,13 @@ class TurmaUpdateView(UpdateView):
         context['salas'] = Sala.objects.all()
         return context
 
-class TurmaDeleteView(DeleteView):
+class TurmaDeleteView(LoginRequiredMixin, DeleteView):
     model = Turma
     template_name = 'cadastro/turma_confirm_delete.html'
     success_url = reverse_lazy('turma_list')
 
 # Curso
-class CursoListView(ListView):
+class CursoListView(LoginRequiredMixin, ListView):
     model = Curso
     template_name = 'cadastro/curso_list.html'
     paginate_by = 10
@@ -453,26 +454,26 @@ class CursoListView(ListView):
                 queryset = queryset.filter(abreviatura__icontains=q)
         return queryset
 
-class CursoCreateView(CreateView):
+class CursoCreateView(LoginRequiredMixin, CreateView):
     model = Curso
     form_class = CursoForm
     template_name = 'cadastro/curso_form.html'
     success_url = reverse_lazy('curso_list')
 
-class CursoUpdateView(UpdateView):
+class CursoUpdateView(LoginRequiredMixin, UpdateView):
     model = Curso
     form_class = CursoForm
     template_name = 'cadastro/curso_form.html'
     success_url = reverse_lazy('curso_list')
 
-class CursoDeleteView(DeleteView):
+class CursoDeleteView(LoginRequiredMixin, DeleteView):
     model = Curso
     template_name = 'cadastro/curso_confirm_delete.html'
     success_url = reverse_lazy('curso_list')
 
 
 # DiaSemana
-class DiaSemanaListView(ListView):
+class DiaSemanaListView(LoginRequiredMixin, ListView):
     model = DiaSemana
     template_name = 'cadastro/diasemana_list.html'
     paginate_by = 10
@@ -487,25 +488,25 @@ class DiaSemanaListView(ListView):
                 queryset = queryset.filter(nome__icontains=q)
         return queryset
 
-class DiaSemanaCreateView(CreateView):
+class DiaSemanaCreateView(LoginRequiredMixin, CreateView):
     model = DiaSemana
     form_class = DiaSemanaForm
     template_name = 'cadastro/diasemana_form.html'
     success_url = reverse_lazy('diasemana_list')
 
-class DiaSemanaUpdateView(UpdateView):
+class DiaSemanaUpdateView(LoginRequiredMixin, UpdateView):
     model = DiaSemana
     form_class = DiaSemanaForm
     template_name = 'cadastro/diasemana_form.html'
     success_url = reverse_lazy('diasemana_list')
 
-class DiaSemanaDeleteView(DeleteView):
+class DiaSemanaDeleteView(LoginRequiredMixin, DeleteView):
     model = DiaSemana
     template_name = 'cadastro/diasemana_confirm_delete.html'
     success_url = reverse_lazy('diasemana_list')
 
 # Semestre
-class SemestreListView(ListView):
+class SemestreListView(LoginRequiredMixin, ListView):
     model = Semestre
     template_name = 'cadastro/semestre_list.html'
     paginate_by = 10
@@ -522,25 +523,25 @@ class SemestreListView(ListView):
                 queryset = queryset.filter(periodo__icontains=q)
         return queryset
 
-class SemestreCreateView(CreateView):
+class SemestreCreateView(LoginRequiredMixin, CreateView):
     model = Semestre
     form_class = SemestreForm
     template_name = 'cadastro/semestre_form.html'
     success_url = reverse_lazy('semestre_list')
 
-class SemestreUpdateView(UpdateView):
+class SemestreUpdateView(LoginRequiredMixin, UpdateView):
     model = Semestre
     form_class = SemestreForm
     template_name = 'cadastro/semestre_form.html'
     success_url = reverse_lazy('semestre_list')
 
-class SemestreDeleteView(DeleteView):
+class SemestreDeleteView(LoginRequiredMixin, DeleteView):
     model = Semestre
     template_name = 'cadastro/semestre_confirm_delete.html'
     success_url = reverse_lazy('semestre_list')
 
 # Predio
-class PredioListView(ListView):
+class PredioListView(LoginRequiredMixin, ListView):
     model = Predio
     template_name = 'cadastro/predio_list.html'
     paginate_by = 10
@@ -557,25 +558,25 @@ class PredioListView(ListView):
                 queryset = queryset.filter(Endereco__icontains=q)
         return queryset
 
-class PredioCreateView(CreateView):
+class PredioCreateView(LoginRequiredMixin, CreateView):
     model = Predio
     form_class = PredioForm
     template_name = 'cadastro/predio_form.html'
     success_url = reverse_lazy('predio_list')
 
-class PredioUpdateView(UpdateView):
+class PredioUpdateView(LoginRequiredMixin, UpdateView):
     model = Predio
     form_class = PredioForm
     template_name = 'cadastro/predio_form.html'
     success_url = reverse_lazy('predio_list')
 
-class PredioDeleteView(DeleteView):
+class PredioDeleteView(LoginRequiredMixin, DeleteView):
     model = Predio
     template_name = 'cadastro/predio_confirm_delete.html'
     success_url = reverse_lazy('predio_list')
 
 # Sala
-class SalaListView(ListView):
+class SalaListView(LoginRequiredMixin, ListView):
     model = Sala
     template_name = 'cadastro/sala_list.html'
     paginate_by = 10
@@ -592,19 +593,19 @@ class SalaListView(ListView):
                 queryset = queryset.filter(predio__nome__icontains=q)
         return queryset
 
-class SalaCreateView(CreateView):
+class SalaCreateView(LoginRequiredMixin, CreateView):
     model = Sala
     form_class = SalaForm
     template_name = 'cadastro/sala_form.html'
     success_url = reverse_lazy('sala_list')
 
-class SalaUpdateView(UpdateView):
+class SalaUpdateView(LoginRequiredMixin, UpdateView):
     model = Sala
     form_class = SalaForm
     template_name = 'cadastro/sala_form.html'
     success_url = reverse_lazy('sala_list')
 
-class SalaDeleteView(DeleteView):
+class SalaDeleteView(LoginRequiredMixin, DeleteView):
     model = Sala
     template_name = 'cadastro/sala_confirm_delete.html'
     success_url = reverse_lazy('sala_list')

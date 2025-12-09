@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 import calendar
 from datetime import datetime
@@ -49,6 +50,26 @@ def index(request):
         next_month = 1
         next_year += 1
 
+    # Get events for this month
+    from .models import EventDate
+    
+    events_in_month = EventDate.objects.filter(
+        date__year=year, 
+        date__month=month
+    ).select_related('event', 'event__tipo')
+    
+    events_map = {}
+    for event_date in events_in_month:
+        day = event_date.date.day
+        if day not in events_map:
+            # Store event details
+            events_map[day] = {
+                'color': event_date.event.tipo.cor,
+                'title': event_date.event.title,
+                'description': event_date.event.description or 'Sem descrição',
+                'type': event_date.event.tipo.nome
+            }
+
     context = {
         'year': year,
         'month': month,
@@ -58,12 +79,13 @@ def index(request):
         'prev_month': prev_month,
         'next_year': next_year,
         'next_month': next_month,
+        'events_map': events_map,
     }
 
     return render(request, 'calendario/index.html', context)
 
 # Event
-class EventListView(ListView):
+class EventListView(LoginRequiredMixin, ListView):
     model = Event
     template_name = 'calendario/event_list.html'
     paginate_by = 10
@@ -75,25 +97,57 @@ class EventListView(ListView):
             queryset = queryset.filter(title__icontains=q)
         return queryset
 
-class EventCreateView(CreateView):
+class EventCreateView(LoginRequiredMixin, CreateView):
     model = Event
     form_class = EventForm
     template_name = 'calendario/event_form.html'
     success_url = reverse_lazy('event_list')
 
-class EventUpdateView(UpdateView):
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        selected_dates = self.request.POST.get('selected_dates', '')
+        if selected_dates:
+            from .models import EventDate
+            dates = selected_dates.split(',')
+            for date_str in dates:
+                if date_str:
+                    EventDate.objects.create(event=self.object, date=date_str)
+        return response
+
+class EventUpdateView(LoginRequiredMixin, UpdateView):
     model = Event
     form_class = EventForm
     template_name = 'calendario/event_form.html'
     success_url = reverse_lazy('event_list')
 
-class EventDeleteView(DeleteView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['existing_dates'] = list(self.object.dates.values_list('date', flat=True))
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        selected_dates = self.request.POST.get('selected_dates', '')
+        if selected_dates:
+            from .models import EventDate
+            # Clear existing dates and add new ones
+            self.object.dates.all().delete()
+            dates = selected_dates.split(',')
+            for date_str in dates:
+                if date_str:
+                    EventDate.objects.create(event=self.object, date=date_str)
+        else:
+            # If empty, it might mean all dates were removed
+            self.object.dates.all().delete()
+        return response
+
+class EventDeleteView(LoginRequiredMixin, DeleteView):
     model = Event
     template_name = 'calendario/event_confirm_delete.html'
     success_url = reverse_lazy('event_list')
 
 # TipoEventos
-class TipoEventosListView(ListView):
+class TipoEventosListView(LoginRequiredMixin, ListView):
     model = TipoEventos
     template_name = 'calendario/tipoeventos_list.html'
     paginate_by = 10
@@ -105,19 +159,19 @@ class TipoEventosListView(ListView):
             queryset = queryset.filter(nome__icontains=q)
         return queryset
 
-class TipoEventosCreateView(CreateView):
+class TipoEventosCreateView(LoginRequiredMixin, CreateView):
     model = TipoEventos
     form_class = TipoEventosForm
     template_name = 'calendario/tipoeventos_form.html'
     success_url = reverse_lazy('tipoeventos_list')
 
-class TipoEventosUpdateView(UpdateView):
+class TipoEventosUpdateView(LoginRequiredMixin, UpdateView):
     model = TipoEventos
     form_class = TipoEventosForm
     template_name = 'calendario/tipoeventos_form.html'
     success_url = reverse_lazy('tipoeventos_list')
 
-class TipoEventosDeleteView(DeleteView):
+class TipoEventosDeleteView(LoginRequiredMixin, DeleteView):
     model = TipoEventos
     template_name = 'calendario/tipoeventos_confirm_delete.html'
     success_url = reverse_lazy('tipoeventos_list')
